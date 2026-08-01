@@ -65,6 +65,7 @@ async function init() {
   const formEl = document.getElementById("inputs");
   const messagesEl = document.getElementById("messages");
   const mapEl = document.getElementById("map");
+  const listEl = document.getElementById("itinerary-list-container");
 
   let rendered = { route: null, markerRecords: [] };
   let mapsApi = null;
@@ -79,7 +80,7 @@ async function init() {
 
   const render = (state) => {
     clearRendered();
-    rendered = renderPlan(map, mapsApi, messagesEl, state);
+    rendered = renderPlan(map, mapsApi, messagesEl, state, listEl);
     if (mapsApi && rendered.markerRecords.length > 0) {
       wireClickPriority(mapsApi, map, rendered.markerRecords);
     }
@@ -90,18 +91,29 @@ async function init() {
   try {
     courseData = await fetchCourseData();
   } catch (error) {
-    renderPlan(null, null, messagesEl, {
-      courseError: error instanceof CourseDataError ? error.message : "Course data is unavailable.",
-    });
+    renderPlan(
+      null,
+      null,
+      messagesEl,
+      { courseError: error instanceof CourseDataError ? error.message : "Course data is unavailable." },
+      listEl,
+    );
     return;
   }
 
   try {
     mapsApi = await loadMapsApi(injectMapsScript);
   } catch (error) {
-    renderPlan(null, null, messagesEl, {
-      mapsError: error instanceof MapsLoadError ? "Google Maps failed to load — try reloading the page." : String(error),
-    });
+    renderPlan(
+      null,
+      null,
+      messagesEl,
+      {
+        mapsError:
+          error instanceof MapsLoadError ? "Google Maps failed to load — try reloading the page." : String(error),
+      },
+      listEl,
+    );
     return;
   }
 

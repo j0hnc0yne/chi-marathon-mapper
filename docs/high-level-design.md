@@ -17,6 +17,7 @@ Given a runner's start time and average per-mile pace, compute the estimated clo
 
 - Given a start time and average pace, show the estimated clock time at each mile marker, accurate to the constant-pace assumption.
 - Render those estimates as dots on a map of the actual Chicago Marathon course.
+- Alongside the map, present the same predicted mile-marker times and suggested stops as a chronological list, so the plan is readable without interacting with map markers.
 - Produce a short, ordered list of suggested viewing spots reachable in sequence, each with its expected travel/wait slack.
 - Produce a shareable URL that reproduces the same plan for another viewer, with no server round-trip required.
 - Run entirely as static files servable from GitHub Pages — no backend, no build-time secrets required to view the page.
@@ -70,7 +71,7 @@ flowchart LR
 - **Travel-time matrix**: static, precomputed (offline, one-time) walking and transit travel times between every pair of curated viewing spots.
 - **Pace predictor**: a pure client-side function mapping start time, pace, and mile-marker distance to an estimated clock time at each marker.
 - **Itinerary suggester**: a pure client-side function that, given predicted times at each viewing spot and the travel-time matrix, selects a feasible ordered sequence of spots — each reachable before the runner arrives, with slack.
-- **Map display**: the Google Maps JavaScript API renders the course and drops time-labeled dots at mile markers and suggested spots. This is the one live third-party dependency the page has, used only for rendering; it requires a client-side Maps API key restricted by HTTP referrer to the GitHub Pages domain.
+- **Map display**: the Google Maps JavaScript API renders the course and drops time-labeled dots at mile markers and suggested spots. This is the one live third-party dependency the page has, used only for rendering; it requires a client-side Maps API key restricted by HTTP referrer to the GitHub Pages domain. Below the map, the same predicted mile-marker times and itinerary stops are also rendered as a chronological text list, giving the spectator a scannable, non-map view of the identical plan.
 - **Share link**: all user inputs (start time, pace) are serialized to URL query parameters. Loading the page with those parameters pre-populates the form and deterministically re-derives everything else.
 
 ## Key Design Decisions

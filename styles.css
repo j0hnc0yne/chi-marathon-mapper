@@ -66,3 +66,16 @@ header p {
   border-radius: 8px;
   background: #e8eaed;
 }
+
+#itinerary-list-container {
+  margin-top: 1rem;
+}
+
+.itinerary-list {
+  padding-left: 1.5rem;
+  margin: 0;
+}
+
+.itinerary-list-stop {
+  font-weight: 600;
+}

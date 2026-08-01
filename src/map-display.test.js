@@ -2,8 +2,10 @@
 import { describe, expect, it } from "vitest";
 import {
   MapsLoadError,
+  buildListRows,
   buildMapsScriptUrl,
   loadMapsApi,
+  renderList,
   renderMileMarkers,
   renderPlan,
   renderRoute,
@@ -157,61 +159,208 @@ describe("stacking and click priority", () => {
 });
 
 describe("renderPlan state rendering", () => {
-  // @spec MAP-006
-  it("renders only the bare route while no valid input/plan is in effect", () => {
+  // @spec MAP-006, MAP-019
+  it("renders only the bare route while no valid input/plan is in effect, and no list rows", () => {
     const mapsApi = createFakeMapsApi();
     const container = document.createElement("div");
-    renderPlan(FAKE_MAP, mapsApi, container, {
-      courseMileMarkers: [
-        { mile: 0, lat: 41.87, lng: -87.67 },
-        { mile: 1, lat: 41.88, lng: -87.66 },
-      ],
-      mileMarkerTimes: null,
-      itinerary: null,
-    });
+    const listContainer = document.createElement("div");
+    renderPlan(
+      FAKE_MAP,
+      mapsApi,
+      container,
+      {
+        courseMileMarkers: [
+          { mile: 0, lat: 41.87, lng: -87.67 },
+          { mile: 1, lat: 41.88, lng: -87.66 },
+        ],
+        mileMarkerTimes: null,
+        itinerary: null,
+      },
+      listContainer,
+    );
     expect(mapsApi.__created.polylines).toHaveLength(1);
     expect(mapsApi.__created.markers).toHaveLength(0);
+    expect(listContainer.querySelectorAll("li")).toHaveLength(0);
   });
 
-  // @spec MAP-007
-  it("still renders the one sparse-result stop with full styling, plus a warning message", () => {
+  // @spec MAP-007, MAP-020, MAP-022
+  it("still renders the one sparse-result stop with full styling, plus a warning message above the map and next to the list", () => {
     const mapsApi = createFakeMapsApi();
     const container = document.createElement("div");
-    renderPlan(FAKE_MAP, mapsApi, container, {
-      courseMileMarkers: [{ mile: 0, lat: 41.87, lng: -87.67 }],
-      mileMarkerTimes: [{ mile: 0, lat: 41.87, lng: -87.67, predictedTime: new Date("2025-10-12T07:30:00-05:00") }],
-      itinerary: {
-        sparse: true,
-        stops: [
-          {
-            spot: { id: "s1", name: "Start", approximatedMile: false },
-            predictedTime: new Date("2025-10-12T07:30:00-05:00"),
-            arrivalSlack: null,
-            sequence: 1,
-          },
-        ],
+    const listContainer = document.createElement("div");
+    renderPlan(
+      FAKE_MAP,
+      mapsApi,
+      container,
+      {
+        courseMileMarkers: [{ mile: 0, lat: 41.87, lng: -87.67 }],
+        mileMarkerTimes: [{ mile: 0, lat: 41.87, lng: -87.67, predictedTime: new Date("2025-10-12T07:30:00-05:00") }],
+        itinerary: {
+          sparse: true,
+          stops: [
+            {
+              spot: { id: "s1", name: "Start", approximatedMile: false },
+              predictedTime: new Date("2025-10-12T07:30:00-05:00"),
+              arrivalSlack: null,
+              sequence: 1,
+            },
+          ],
+        },
       },
-    });
+      listContainer,
+    );
     expect(mapsApi.__created.markers.length).toBeGreaterThanOrEqual(1);
     expect(container.textContent.toLowerCase()).toContain("no feasible multi-stop plan");
+    expect(listContainer.textContent.toLowerCase()).toContain("no feasible multi-stop plan");
+    expect(listContainer.querySelectorAll("li")).toHaveLength(2); // the one mile-marker row + the one stop row
   });
 
-  // @spec MAP-010
-  it("displays an explicit error in place of the map when the Maps API failed to load", () => {
+  // @spec MAP-010, MAP-021
+  it("displays an explicit error in place of the map when the Maps API failed to load, and suppresses the list", () => {
     const mapsApi = createFakeMapsApi();
     const container = document.createElement("div");
-    renderPlan(FAKE_MAP, mapsApi, container, { mapsError: "Google Maps failed to load." });
+    const listContainer = document.createElement("div");
+    renderPlan(FAKE_MAP, mapsApi, container, { mapsError: "Google Maps failed to load." }, listContainer);
     expect(mapsApi.__created.polylines).toHaveLength(0);
     expect(container.textContent).toContain("Google Maps failed to load.");
+    expect(listContainer.querySelectorAll("li")).toHaveLength(0);
   });
 
-  // @spec MAP-012
-  it("displays an explicit error in place of the map when course data failed to load", () => {
+  // @spec MAP-012, MAP-021
+  it("displays an explicit error in place of the map when course data failed to load, and suppresses the list", () => {
     const mapsApi = createFakeMapsApi();
     const container = document.createElement("div");
-    renderPlan(FAKE_MAP, mapsApi, container, { courseError: "Course data is unavailable." });
+    const listContainer = document.createElement("div");
+    renderPlan(FAKE_MAP, mapsApi, container, { courseError: "Course data is unavailable." }, listContainer);
     expect(mapsApi.__created.polylines).toHaveLength(0);
     expect(container.textContent).toContain("Course data is unavailable.");
+    expect(listContainer.querySelectorAll("li")).toHaveLength(0);
+  });
+
+  // @spec MAP-013
+  it("renders a combined chronological list with one row per mile marker plus one row per suggested stop", () => {
+    const mapsApi = createFakeMapsApi();
+    const container = document.createElement("div");
+    const listContainer = document.createElement("div");
+    renderPlan(
+      FAKE_MAP,
+      mapsApi,
+      container,
+      {
+        courseMileMarkers: [
+          { mile: 0, lat: 41.87, lng: -87.67 },
+          { mile: 3, lat: 41.9, lng: -87.65 },
+        ],
+        mileMarkerTimes: [
+          { mile: 0, lat: 41.87, lng: -87.67, predictedTime: new Date("2025-10-12T07:00:00-05:00") },
+          { mile: 3, lat: 41.9, lng: -87.65, predictedTime: new Date("2025-10-12T07:30:00-05:00") },
+        ],
+        itinerary: {
+          sparse: false,
+          stops: [
+            {
+              spot: { id: "s1", name: "Grand & State", accessNotes: "Red Line", approximatedMile: false },
+              predictedTime: new Date("2025-10-12T07:15:00-05:00"),
+              arrivalSlack: null,
+              sequence: 1,
+            },
+          ],
+        },
+      },
+      listContainer,
+    );
+    expect(listContainer.querySelectorAll("li")).toHaveLength(3);
+  });
+});
+
+describe("buildListRows", () => {
+  // @spec MAP-013
+  it("sorts mile-marker rows and suggested-stop rows together by predicted clock time ascending", () => {
+    const mileMarkerTimes = [
+      { mile: 0, predictedTime: new Date("2025-10-12T07:00:00-05:00") },
+      { mile: 3, predictedTime: new Date("2025-10-12T07:30:00-05:00") },
+    ];
+    const stops = [
+      {
+        spot: { id: "s1", name: "Grand & State" },
+        predictedTime: new Date("2025-10-12T07:15:00-05:00"),
+        sequence: 1,
+      },
+    ];
+    const rows = buildListRows(mileMarkerTimes, stops);
+    expect(rows.map((r) => r.kind)).toEqual(["marker", "stop", "marker"]);
+  });
+
+  // @spec MAP-017
+  it("keeps a suggested stop's row and its coincident mile marker's row separate rather than merging them", () => {
+    const mileMarkerTimes = [{ mile: 8, predictedTime: new Date("2025-10-12T08:00:00-05:00") }];
+    const stops = [
+      {
+        spot: { id: "s1", name: "Broadway & Belmont" },
+        predictedTime: new Date("2025-10-12T08:00:00-05:00"),
+        sequence: 1,
+      },
+    ];
+    const rows = buildListRows(mileMarkerTimes, stops);
+    expect(rows).toHaveLength(2);
+  });
+
+  // @spec MAP-018
+  it("lists the suggested-stop row first when it shares the exact same predicted time as a mile-marker row", () => {
+    const tiedTime = new Date("2025-10-12T08:00:00-05:00");
+    const mileMarkerTimes = [{ mile: 8, predictedTime: tiedTime }];
+    const stops = [{ spot: { id: "s1", name: "Broadway & Belmont" }, predictedTime: tiedTime, sequence: 1 }];
+    const rows = buildListRows(mileMarkerTimes, stops);
+    expect(rows.map((r) => r.kind)).toEqual(["stop", "marker"]);
+  });
+});
+
+describe("renderList", () => {
+  // @spec MAP-014
+  it("shows the mile number and predicted clock time for a mile-marker row", () => {
+    const container = document.createElement("div");
+    renderList(container, [{ kind: "marker", mile: 7, time: new Date("2025-10-12T08:10:00-05:00") }]);
+    expect(container.textContent).toContain("Mile 7");
+    expect(container.textContent).toContain("08:10");
+  });
+
+  // @spec MAP-015
+  it("shows sequence, name, access notes, predicted time, and arrival slack for a suggested-stop row", () => {
+    const container = document.createElement("div");
+    renderList(container, [
+      {
+        kind: "stop",
+        time: new Date("2025-10-12T08:00:00-05:00"),
+        stop: {
+          sequence: 2,
+          arrivalSlack: 9,
+          spot: { name: "Webster & Racine", accessNotes: "Brown Line", approximatedMile: false },
+        },
+      },
+    ]);
+    const text = container.textContent;
+    expect(text).toContain("2");
+    expect(text).toContain("Webster & Racine");
+    expect(text).toContain("Brown Line");
+    expect(text).toContain("08:00");
+    expect(text).toContain("9");
+  });
+
+  // @spec MAP-016
+  it("notes when a suggested stop's row time is approximated", () => {
+    const container = document.createElement("div");
+    renderList(container, [
+      {
+        kind: "stop",
+        time: new Date("2025-10-12T08:00:00-05:00"),
+        stop: {
+          sequence: 1,
+          arrivalSlack: 5,
+          spot: { name: "Chinatown", accessNotes: "Red Line", approximatedMile: true },
+        },
+      },
+    ]);
+    expect(container.textContent.toLowerCase()).toContain("approximate");
   });
 });
 

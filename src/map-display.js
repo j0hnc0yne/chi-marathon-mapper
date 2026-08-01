@@ -103,9 +103,55 @@ function showMessage(container, text, kind) {
   container.appendChild(el);
 }
 
-// @spec MAP-006, MAP-007, MAP-010, MAP-012
-export function renderPlan(map, mapsApi, messageContainer, state) {
+const SPARSE_WARNING_TEXT =
+  "No feasible multi-stop plan was found for this pace — the runner outruns the travel time between viewing spots.";
+
+// @spec MAP-013, MAP-017, MAP-018
+export function buildListRows(mileMarkerTimes, stops) {
+  const rows = [
+    ...mileMarkerTimes.map((marker) => ({ kind: "marker", mile: marker.mile, time: marker.predictedTime })),
+    ...stops.map((stop) => ({ kind: "stop", time: stop.predictedTime, stop })),
+  ];
+  rows.sort((a, b) => {
+    const diff = a.time.getTime() - b.time.getTime();
+    if (diff !== 0) return diff;
+    if (a.kind === b.kind) return 0;
+    return a.kind === "stop" ? -1 : 1;
+  });
+  return rows;
+}
+
+// @spec MAP-014, MAP-015, MAP-016
+export function renderList(container, rows) {
+  const list = document.createElement("ol");
+  list.className = "itinerary-list";
+  for (const row of rows) {
+    const li = document.createElement("li");
+    if (row.kind === "marker") {
+      li.className = "itinerary-list-marker";
+      li.textContent = `Mile ${row.mile} — ${formatChicagoTime(row.time)}`;
+    } else {
+      li.className = "itinerary-list-stop";
+      const parts = [`Stop ${row.stop.sequence}: ${row.stop.spot.name}`];
+      if (row.stop.spot.accessNotes) parts.push(row.stop.spot.accessNotes);
+      parts.push(`runner expected at ${formatChicagoTime(row.time)}`);
+      if (typeof row.stop.arrivalSlack === "number") {
+        parts.push(`arrive about ${Math.round(row.stop.arrivalSlack)} min before the runner`);
+      }
+      if (row.stop.spot.approximatedMile) {
+        parts.push("time is approximate — this spot sits between mile markers");
+      }
+      li.textContent = parts.join(" — ");
+    }
+    list.appendChild(li);
+  }
+  container.appendChild(list);
+}
+
+// @spec MAP-006, MAP-007, MAP-010, MAP-012, MAP-013, MAP-019, MAP-020, MAP-021, MAP-022
+export function renderPlan(map, mapsApi, messageContainer, state, listContainer) {
   messageContainer.replaceChildren();
+  listContainer?.replaceChildren();
 
   if (state.mapsError) {
     showMessage(messageContainer, state.mapsError, "error");
@@ -128,12 +174,13 @@ export function renderPlan(map, mapsApi, messageContainer, state) {
   if (state.itinerary) {
     markerRecords.push(...renderSuggestedStops(map, mapsApi, state.itinerary.stops));
     if (state.itinerary.sparse) {
-      showMessage(
-        messageContainer,
-        "No feasible multi-stop plan was found for this pace — the runner outruns the travel time between viewing spots.",
-        "warning",
-      );
+      showMessage(messageContainer, SPARSE_WARNING_TEXT, "warning");
+      if (listContainer) showMessage(listContainer, SPARSE_WARNING_TEXT, "warning");
     }
+  }
+
+  if (listContainer) {
+    renderList(listContainer, buildListRows(state.mileMarkerTimes, state.itinerary?.stops ?? []));
   }
 
   return { route, markerRecords };
