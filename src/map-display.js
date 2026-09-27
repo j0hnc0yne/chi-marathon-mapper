@@ -19,6 +19,63 @@ export async function loadMapsApi(scriptLoader) {
   }
 }
 
+// The Maps API accepts a colour scheme only when a map is constructed, so the
+// resolved theme is a construction argument and a theme change means a new map.
+// Its own FOLLOW_SYSTEM would honour the OS and ignore a pin, which is exactly
+// the case a pin exists for.
+// The map's dark palette. Separate from the CSS tokens because the map is
+// styled through the Maps API rather than by the stylesheet — see the
+// map-display design doc's open question about deriving one from the other.
+const DARK_MAP_STYLE = [
+  { elementType: "geometry", stylers: [{ color: "#212121" }] },
+  { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#9e9e9e" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#212121" }] },
+  { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#757575" }] },
+  { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#757575" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#181818" }] },
+  { featureType: "road", elementType: "geometry.fill", stylers: [{ color: "#2c2c2c" }] },
+  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a8a8a" }] },
+  { featureType: "road.arterial", elementType: "geometry", stylers: [{ color: "#373737" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#3c3c3c" }] },
+  { featureType: "transit", elementType: "geometry", stylers: [{ color: "#2f2f2f" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#000000" }] },
+  { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#3d3d3d" }] },
+];
+
+function mapStyleFor(resolvedTheme) {
+  return resolvedTheme === "dark" ? DARK_MAP_STYLE : [];
+}
+
+// The Maps API's own colour-scheme option is construction-only, and the API
+// cannot dispose of a map — so honouring a theme change through it would mean
+// building a second map beside a live first one, which stops overlays
+// attaching. A palette applied in place needs only one map, ever.
+// @spec MAP-023, MAP-027
+export function createMap(mapsApi, container, { center, zoom, resolvedTheme }) {
+  return new mapsApi.Map(container, {
+    center,
+    zoom,
+    mapTypeControl: false,
+    streetViewControl: false,
+    styles: mapStyleFor(resolvedTheme),
+  });
+}
+
+/**
+ * Repaints the live map for a new theme. Only the styles are touched, so the
+ * camera, the route, the markers and their info windows all stay as they are.
+ * Returns false when there is no map — the Maps API or course data may have
+ * failed to load, and the theme control keeps working on those pages by design.
+ *
+ * @spec MAP-024, MAP-025
+ */
+export function applyThemeToMap(map, resolvedTheme) {
+  if (!map) return false;
+  map.setOptions({ styles: mapStyleFor(resolvedTheme) });
+  return true;
+}
+
 function formatChicagoTime(date) {
   return date.toLocaleTimeString("en-US", {
     timeZone: "America/Chicago",
@@ -37,11 +94,14 @@ const SUGGESTED_STOP_ICON = {
   strokeWeight: 1.5,
 };
 
+// Drawn from the course's route geometry, not from the mile markers: markers
+// are a third of a mile apart, so a line through them cuts across city blocks,
+// the river and Lincoln Park.
 // @spec MAP-001
-export function renderRoute(map, mapsApi, mileMarkers) {
+export function renderRoute(map, mapsApi, routeGeometry) {
   return new mapsApi.Polyline({
     map,
-    path: mileMarkers.map((m) => ({ lat: m.lat, lng: m.lng })),
+    path: routeGeometry.map((point) => ({ lat: point.lat, lng: point.lng })),
     strokeColor: "#1a73e8",
     strokeWeight: 4,
   });
@@ -162,7 +222,7 @@ export function renderPlan(map, mapsApi, messageContainer, state, listContainer)
     return { route: null, markerRecords: [] };
   }
 
-  const route = renderRoute(map, mapsApi, state.courseMileMarkers);
+  const route = renderRoute(map, mapsApi, state.courseRouteGeometry);
   const markerRecords = [];
 
   if (!state.mileMarkerTimes) {

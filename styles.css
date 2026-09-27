@@ -1,3 +1,64 @@
+/* @spec THEME-005, THEME-016, THEME-020, THEME-021, THEME-022, THEME-028, THEME-029
+   Colour tokens. Declared three times: light on :root, dark under the system
+   preference, and dark again under an explicit pin. The dark values are repeated
+   rather than shared because CSS cannot apply one block under two unrelated
+   conditions — see docs/intent/theme/theme-design.md.
+
+   `color-scheme` sits alongside the tokens in each block: custom properties
+   cannot reach browser-drawn surfaces (the time input's picker, scrollbars,
+   focus rings), and declaring the scheme is what themes those. */
+:root {
+  color-scheme: light;
+
+  --color-background: #ffffff;
+  --color-text: #1c1c1c;
+  --color-text-secondary: #555555;
+  --color-input-error: #b3261e;
+  --color-error-text: #b3261e;
+  --color-error-background: #fdecea;
+  --color-warning-text: #8a5300;
+  --color-warning-background: #fff4e5;
+  --color-map-placeholder: #e8eaed;
+  --color-border: #767676;
+  --color-focus-ring: #0b57d0;
+}
+
+/* Guarded so that a pinned light theme wins over a dark system preference —
+   without the guard the pin would lose to the very thing it exists to override. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-background: #121212;
+    --color-text: #e8e8e8;
+    --color-text-secondary: #a8a8a8;
+    --color-input-error: #ff8a80;
+    --color-error-text: #ff8a80;
+    --color-error-background: #3b1512;
+    --color-warning-text: #ffcc80;
+    --color-warning-background: #3a2a10;
+    --color-map-placeholder: #1f1f1f;
+    --color-border: #8a8a8a;
+    --color-focus-ring: #a8c7fa;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-background: #121212;
+  --color-text: #e8e8e8;
+  --color-text-secondary: #a8a8a8;
+  --color-input-error: #ff8a80;
+  --color-error-text: #ff8a80;
+  --color-error-background: #3b1512;
+  --color-warning-text: #ffcc80;
+  --color-warning-background: #3a2a10;
+  --color-map-placeholder: #1f1f1f;
+  --color-border: #8a8a8a;
+  --color-focus-ring: #a8c7fa;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -7,11 +68,39 @@ body {
   margin: 0 auto;
   max-width: 60rem;
   padding: 1rem;
-  color: #1c1c1c;
+  color: var(--color-text);
+  background: var(--color-background);
 }
 
 header p {
-  color: #555;
+  color: var(--color-text-secondary);
+}
+
+#theme-control {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0 0 1rem;
+  padding: 0.5rem 0.75rem;
+}
+
+#theme-control legend {
+  font-weight: 600;
+  padding: 0 0.25rem;
+}
+
+#theme-control label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 #inputs {
@@ -32,10 +121,12 @@ header p {
 #inputs input {
   font-size: 1rem;
   padding: 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
 }
 
 .input-error {
-  color: #b3261e;
+  color: var(--color-input-error);
   flex-basis: 100%;
   margin: 0;
 }
@@ -51,20 +142,21 @@ header p {
 }
 
 .map-message-error {
-  background: #fdecea;
-  color: #b3261e;
+  background: var(--color-error-background);
+  color: var(--color-error-text);
 }
 
 .map-message-warning {
-  background: #fff4e5;
-  color: #8a5300;
+  background: var(--color-warning-background);
+  color: var(--color-warning-text);
 }
 
 #map {
   width: 100%;
   height: 70vh;
   border-radius: 8px;
-  background: #e8eaed;
+  overflow: hidden;
+  background: var(--color-map-placeholder);
 }
 
 #itinerary-list-container {

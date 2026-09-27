@@ -24,6 +24,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Re-derives the course data from the official map PDF and fails if the
+      # committed file differs — the only check that catches a hand-edit to
+      # generated data (COURSE-030).
+      - run: npm run check-course-data
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3

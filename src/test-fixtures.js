@@ -12,6 +12,25 @@ export function makeFullCourseMileMarkers() {
   return markers;
 }
 
+// Denser than the mile markers, as real route geometry is: several points per
+// mile, so a polyline drawn from it is distinguishable from one drawn from the
+// markers alone.
+export function makeRouteGeometry() {
+  const points = [];
+  const markers = makeFullCourseMileMarkers();
+  for (let i = 0; i < markers.length - 1; i += 1) {
+    for (let step = 0; step < 4; step += 1) {
+      const t = step / 4;
+      points.push({
+        lat: markers[i].lat + t * (markers[i + 1].lat - markers[i].lat),
+        lng: markers[i].lng + t * (markers[i + 1].lng - markers[i].lng),
+      });
+    }
+  }
+  points.push({ lat: markers[markers.length - 1].lat, lng: markers[markers.length - 1].lng });
+  return points;
+}
+
 export const sparseMileMarkers = [
   { mile: 0, lat: 41.871, lng: -87.671 },
   { mile: 3, lat: 41.912, lng: -87.638 },

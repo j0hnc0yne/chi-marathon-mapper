@@ -57,6 +57,24 @@ function validateMileMarkers(mileMarkers) {
   }
 }
 
+// Loadability only: a well-formed geometry can still trace the wrong course,
+// and nothing available here could tell. Correctness is settled at curation
+// time against the published map — see the course-data design doc.
+// @spec COURSE-011, COURSE-014
+function validateRouteGeometry(routeGeometry) {
+  if (!Array.isArray(routeGeometry)) {
+    throw new CourseDataError("Course data is invalid: route geometry is missing or not a list");
+  }
+  if (routeGeometry.length < 2) {
+    throw new CourseDataError("Course data is invalid: route geometry needs at least two points to describe a route");
+  }
+  for (const point of routeGeometry) {
+    if (!isFiniteNumber(point?.lat) || !isFiniteNumber(point?.lng)) {
+      throw new CourseDataError("Course data is invalid: a route geometry point is missing lat or lng");
+    }
+  }
+}
+
 function validateViewingSpots(viewingSpots) {
   if (!Array.isArray(viewingSpots)) {
     throw new CourseDataError("Course data is invalid: viewing spots are missing or not a list");
@@ -96,8 +114,12 @@ function validateTravelTimeMatrix(travelTimeMatrix, viewingSpots) {
   }
 }
 
-// @spec COURSE-001, COURSE-002, COURSE-003, COURSE-004, COURSE-007, COURSE-008, COURSE-009, COURSE-010
-export function loadCourseData({ mileMarkers, viewingSpots, travelTimeMatrix }) {
+// `_provenance` is deliberately not read or required here: it documents where
+// the data came from for whoever next re-derives it (COURSE-026).
+// @spec COURSE-001, COURSE-002, COURSE-003, COURSE-004, COURSE-007, COURSE-008, COURSE-009, COURSE-010,
+// @spec COURSE-014, COURSE-026
+export function loadCourseData({ routeGeometry, mileMarkers, viewingSpots, travelTimeMatrix }) {
+  validateRouteGeometry(routeGeometry);
   validateMileMarkers(mileMarkers);
   validateViewingSpots(viewingSpots);
   validateTravelTimeMatrix(travelTimeMatrix, viewingSpots);
@@ -108,6 +130,7 @@ export function loadCourseData({ mileMarkers, viewingSpots, travelTimeMatrix }) 
   });
 
   return {
+    routeGeometry,
     mileMarkers,
     viewingSpots: resolvedSpots,
     travelTimeMatrix,
