@@ -4,6 +4,22 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Chicago Marathon Spectator Planner</title>
+    <!-- @spec THEME-007
+         Applies a pinned theme before first paint. Deliberately not a module:
+         a module runs after the page is painted, so a viewer who has pinned
+         dark would see a white flash on every load. In the follow-the-system
+         state there is nothing to do — the stylesheet's media query resolves
+         it. Keep in sync with STORAGE_KEY in src/theme.js. -->
+    <script>
+      try {
+        var pinned = localStorage.getItem("chi-marathon-theme");
+        if (pinned === "light" || pinned === "dark") {
+          document.documentElement.setAttribute("data-theme", pinned);
+        }
+      } catch (error) {
+        /* No stored preference is reachable; the system preference applies. */
+      }
+    </script>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -14,6 +30,17 @@
         and a plan for where to watch. The link in your address bar always carries
         your inputs, so share it as-is.
       </p>
+      <!-- @spec THEME-013, THEME-014, THEME-026
+           Served here rather than mounted from code: the module entry point
+           abandons setup when course data or the Maps API fails to load, and the
+           theme has to keep working on those pages too. Outside the inputs form
+           because the form is the plan, and the plan is what the URL carries. -->
+      <fieldset id="theme-control">
+        <legend>Colour scheme</legend>
+        <label><input type="radio" name="theme" value="system" /> System</label>
+        <label><input type="radio" name="theme" value="light" /> Light</label>
+        <label><input type="radio" name="theme" value="dark" /> Dark</label>
+      </fieldset>
     </header>
     <main>
       <form id="inputs" autocomplete="off"></form>

@@ -7,7 +7,7 @@ prefix: INPUT
 
 ## Context and Design Philosophy
 
-Owns the spectator's two inputs — the runner's start time and average pace — and keeps them mirrored between the on-page form and the page's URL query string. The form and the URL are two views of one piece of state, not two separate features: per the HLD's "shareable state lives in the URL, not a server" tenet, the current address bar contents must always be enough to reproduce the current view for another viewer, with no separate "generate a link" step to remember.
+Owns the spectator's two inputs — the runner's start time and average pace — and keeps them mirrored between the on-page form and the page's URL query string. The form and the URL are two views of one piece of state, not two separate features: per the HLD's "the plan lives in the URL, not a server" tenet, the current address bar contents must always be enough to reproduce the current view for another viewer, with no separate "generate a link" step to remember.
 
 ## Fields
 
@@ -23,7 +23,9 @@ State flows in both directions:
 
 ## Recompute Pipeline
 
-Input state is also the sole owner of triggering the rest of the pipeline. Whenever the form holds a valid start time and pace — whether that validity was just reached via a page load with valid query parameters, or via a subsequent in-page edit — input state invokes pace predictor, then itinerary suggester, then map display, in that order, to refresh the displayed plan. No other component polls or independently decides when to recompute; a valid start+pace pair existing in input state is the one trigger condition the rest of the pipeline reacts to.
+Input state is the sole owner of triggering *computation* of the plan. Whenever the form holds a valid start time and pace — whether that validity was just reached via a page load with valid query parameters, or via a subsequent in-page edit — input state invokes pace predictor, then itinerary suggester, then map display, in that order, to refresh the displayed plan. No other component polls or independently decides when to recompute; a valid start+pace pair existing in input state is the one trigger condition for deriving predicted times and an itinerary.
+
+Not everything that reaches map display is a recompute, and what is not is not input state's to trigger. A change of colour scheme, for instance, repaints the map without any input having changed: map display is told directly by the theme component, and no prediction or itinerary is derived again. Input state owns when the plan changes; it does not own everything that happens to the display.
 
 ## Decisions & Alternatives
 
@@ -38,7 +40,7 @@ Input state is also the sole owner of triggering the rest of the pipeline. Whene
 | URL updates during an in-progress, invalid edit | URL stays at its last valid value; no update until validity returns | Clear the URL immediately on invalidity | Avoids flashing an empty or broken-looking link while the spectator is mid-keystroke. |
 | Clearing a valid field back to empty | The corresponding URL param is stripped immediately | Leave a stale value in the URL | Keeps the URL an accurate live mirror of the form at all times. |
 | Time input's timezone | Always interpreted as Chicago race-day local time | Interpret in the spectator's own device timezone | The race happens at one fixed place and time; translating to the viewer's timezone would produce the wrong number for anyone outside Chicago. |
-| Pipeline recompute ownership | Input state triggers pace predictor → itinerary suggester → map display on every valid start+pace state | A separate orchestrator component; each downstream component polls input state for changes | Input state already owns detecting "the form is now valid" (for both load and edit); giving it the one trigger responsibility avoids an extra component whose whole job is watching another component's state. |
+| Pipeline recompute ownership | Input state triggers pace predictor → itinerary suggester → map display on every valid start+pace state, and owns computation only — not every redraw of an already-computed plan | A separate orchestrator component; each downstream component polls input state for changes | Input state already owns detecting "the form is now valid" (for both load and edit); giving it the one trigger responsibility avoids an extra component whose whole job is watching another component's state. |
 
 ## References
 

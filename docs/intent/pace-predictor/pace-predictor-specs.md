@@ -4,7 +4,7 @@
 
 - [x] **PACE-001**: Given a race start timestamp, a per-mile pace, and a course point carrying a distance in miles, the system shall compute the predicted clock time at that point as the start timestamp plus (distance × pace).
 - [x] **PACE-002**: The system shall apply a single constant pace across the entire course when computing predicted times, with no per-segment or negative-split modeling.
-- [x] **PACE-004**: The race date used to compute predicted timestamps shall be a fixed constant tied to the 2025 Chicago Marathon course data, not a spectator-entered value.
+- [x] **PACE-004**: The race date used to compute predicted timestamps shall be a fixed constant tied to the 2026 Chicago Marathon course data, not a spectator-entered value.
 - [x] **PACE-005**: The start time used in prediction shall be the runner's actual start-line crossing time as entered by the spectator (input-state's `start` value), with no wave or corral lookup applied.
 
 ## Input Handling

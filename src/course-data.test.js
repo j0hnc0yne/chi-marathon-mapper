@@ -1,12 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { CourseDataError, getTravelTime, loadCourseData, resolveNearestMile } from "./course-data.js";
-import { makeFullCourseMileMarkers, sparseMileMarkers, travelTimeMatrix, viewingSpots } from "./test-fixtures.js";
+import {
+  makeFullCourseMileMarkers,
+  makeRouteGeometry,
+  sparseMileMarkers,
+  travelTimeMatrix,
+  viewingSpots,
+} from "./test-fixtures.js";
 
 describe("loadCourseData", () => {
   // @spec COURSE-001
   it("normalizes a valid mile marker list of distance + coordinate pairs", () => {
     const mileMarkers = makeFullCourseMileMarkers();
-    const data = loadCourseData({ mileMarkers, viewingSpots, travelTimeMatrix });
+    const data = loadCourseData({ routeGeometry: makeRouteGeometry(), mileMarkers, viewingSpots, travelTimeMatrix });
     expect(data.mileMarkers).toHaveLength(mileMarkers.length);
     expect(data.mileMarkers[0]).toMatchObject({ mile: 0, lat: expect.any(Number), lng: expect.any(Number) });
   });
@@ -64,6 +70,7 @@ describe("loadCourseData", () => {
   it("flags a viewing spot as approximated when it snaps to a nearby mile marker", () => {
     const spotsWithGap = [{ ...viewingSpots[0], nearestMile: 3.4 }];
     const data = loadCourseData({
+      routeGeometry: makeRouteGeometry(),
       mileMarkers: makeFullCourseMileMarkers(),
       viewingSpots: spotsWithGap,
       travelTimeMatrix: [],
@@ -74,6 +81,7 @@ describe("loadCourseData", () => {
   // @spec COURSE-009
   it("does not flag a viewing spot as approximated when its nearest mile exactly matches a marker", () => {
     const data = loadCourseData({
+      routeGeometry: makeRouteGeometry(),
       mileMarkers: makeFullCourseMileMarkers(),
       viewingSpots: [viewingSpots[0]],
       travelTimeMatrix: [],
@@ -109,5 +117,50 @@ describe("getTravelTime", () => {
   // @spec COURSE-006
   it("does not support a driving mode", () => {
     expect(() => getTravelTime(travelTimeMatrix, "spot-mile3", "spot-mile7", "drive")).toThrow();
+  });
+});
+
+describe("route geometry", () => {
+  const valid = () => ({
+    routeGeometry: makeRouteGeometry(),
+    mileMarkers: makeFullCourseMileMarkers(),
+    viewingSpots,
+    travelTimeMatrix,
+  });
+
+  // @spec COURSE-011
+  it("passes route geometry through as an ordered list of coordinates", () => {
+    const data = loadCourseData(valid());
+    expect(data.routeGeometry.length).toBeGreaterThan(makeFullCourseMileMarkers().length);
+    expect(data.routeGeometry[0]).toMatchObject({ lat: expect.any(Number), lng: expect.any(Number) });
+  });
+
+  // @spec COURSE-014
+  it("rejects course data with no route geometry at all", () => {
+    const { routeGeometry, ...withoutGeometry } = valid();
+    expect(() => loadCourseData(withoutGeometry)).toThrow(CourseDataError);
+  });
+
+  // @spec COURSE-014
+  it("rejects route geometry that is not a list", () => {
+    expect(() => loadCourseData({ ...valid(), routeGeometry: { lat: 41.8, lng: -87.6 } })).toThrow(CourseDataError);
+  });
+
+  // @spec COURSE-014
+  it("rejects route geometry holding fewer than two points, which cannot describe a route", () => {
+    expect(() => loadCourseData({ ...valid(), routeGeometry: [{ lat: 41.8, lng: -87.6 }] })).toThrow(CourseDataError);
+  });
+
+  // @spec COURSE-014
+  it("rejects a route geometry point whose coordinate is not a finite number", () => {
+    const geometry = makeRouteGeometry();
+    geometry[3] = { lat: 41.8, lng: Number.NaN };
+    expect(() => loadCourseData({ ...valid(), routeGeometry: geometry })).toThrow(CourseDataError);
+  });
+
+  // @spec COURSE-026
+  it("loads course data that carries no provenance entry, which is documentation rather than a required field", () => {
+    expect(() => loadCourseData(valid())).not.toThrow();
+    expect(() => loadCourseData({ ...valid(), _provenance: undefined })).not.toThrow();
   });
 });

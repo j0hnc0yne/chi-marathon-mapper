@@ -2,6 +2,8 @@
 import { describe, expect, it } from "vitest";
 import {
   MapsLoadError,
+  applyThemeToMap,
+  createMap,
   buildListRows,
   buildMapsScriptUrl,
   loadMapsApi,
@@ -43,16 +45,30 @@ function createFakeMapsApi() {
 const FAKE_MAP = {}; // renderers only pass this through to constructor opts; no real map instance needed
 
 describe("renderRoute", () => {
+  // The course as drawn turns a corner between the two mile markers; geometry
+  // carries that corner and the marker list cannot.
+  const routeGeometry = [
+    { lat: 41.87, lng: -87.67 },
+    { lat: 41.875, lng: -87.67 },
+    { lat: 41.875, lng: -87.66 },
+    { lat: 41.88, lng: -87.66 },
+  ];
+
   // @spec MAP-001
-  it("draws a polyline connecting the course's mile markers", () => {
+  it("draws a polyline following every point of the course's route geometry, in order", () => {
     const mapsApi = createFakeMapsApi();
-    const mileMarkers = [
-      { mile: 0, lat: 41.87, lng: -87.67 },
-      { mile: 1, lat: 41.88, lng: -87.66 },
-    ];
-    renderRoute(FAKE_MAP, mapsApi, mileMarkers);
+    renderRoute(FAKE_MAP, mapsApi, routeGeometry);
     expect(mapsApi.__created.polylines).toHaveLength(1);
-    expect(mapsApi.__created.polylines[0].opts.path).toEqual([
+    expect(mapsApi.__created.polylines[0].opts.path).toEqual(routeGeometry);
+  });
+
+  // @spec MAP-001
+  it("does not shortcut the route by drawing between mile markers", () => {
+    const mapsApi = createFakeMapsApi();
+    renderRoute(FAKE_MAP, mapsApi, routeGeometry);
+    const { path } = mapsApi.__created.polylines[0].opts;
+    expect(path).toHaveLength(4);
+    expect(path).not.toEqual([
       { lat: 41.87, lng: -87.67 },
       { lat: 41.88, lng: -87.66 },
     ]);
@@ -169,7 +185,7 @@ describe("renderPlan state rendering", () => {
       mapsApi,
       container,
       {
-        courseMileMarkers: [
+        courseRouteGeometry: [
           { mile: 0, lat: 41.87, lng: -87.67 },
           { mile: 1, lat: 41.88, lng: -87.66 },
         ],
@@ -193,7 +209,7 @@ describe("renderPlan state rendering", () => {
       mapsApi,
       container,
       {
-        courseMileMarkers: [{ mile: 0, lat: 41.87, lng: -87.67 }],
+        courseRouteGeometry: [{ mile: 0, lat: 41.87, lng: -87.67 }],
         mileMarkerTimes: [{ mile: 0, lat: 41.87, lng: -87.67, predictedTime: new Date("2025-10-12T07:30:00-05:00") }],
         itinerary: {
           sparse: true,
@@ -247,7 +263,7 @@ describe("renderPlan state rendering", () => {
       mapsApi,
       container,
       {
-        courseMileMarkers: [
+        courseRouteGeometry: [
           { mile: 0, lat: 41.87, lng: -87.67 },
           { mile: 3, lat: 41.9, lng: -87.65 },
         ],
@@ -376,5 +392,84 @@ describe("Google Maps API loading", () => {
   it("builds the Maps script URL carrying the client-side API key", () => {
     const url = buildMapsScriptUrl("test-api-key");
     expect(url).toContain("key=test-api-key");
+  });
+});
+
+describe("colour scheme", () => {
+  // A fake Maps API recording every Map constructed and every setOptions call.
+  function createFakeMapsApiWithMaps() {
+    const maps = [];
+    class Map {
+      constructor(element, opts) {
+        this.element = element;
+        this.opts = opts;
+        this.optionUpdates = [];
+        maps.push(this);
+      }
+      setOptions(opts) {
+        this.optionUpdates.push(opts);
+        this.opts = { ...this.opts, ...opts };
+      }
+    }
+    return { Map, ColorScheme: { LIGHT: "LIGHT", DARK: "DARK", FOLLOW_SYSTEM: "FOLLOW_SYSTEM" }, __maps: maps };
+  }
+
+  // @spec MAP-023
+  it("styles the map for the resolved theme it is given", () => {
+    const mapsApi = createFakeMapsApiWithMaps();
+    createMap(mapsApi, document.createElement("div"), {
+      center: { lat: 41.87, lng: -87.65 },
+      zoom: 12,
+      resolvedTheme: "dark",
+    });
+    expect(mapsApi.__maps[0].opts.styles.length).toBeGreaterThan(0);
+  });
+
+  // @spec MAP-023
+  it("leaves the map unstyled in the light theme, and never uses the API's follow-the-system scheme", () => {
+    const mapsApi = createFakeMapsApiWithMaps();
+    createMap(mapsApi, document.createElement("div"), {
+      center: { lat: 41.87, lng: -87.65 },
+      zoom: 12,
+      resolvedTheme: "light",
+    });
+    expect(mapsApi.__maps[0].opts.styles).toEqual([]);
+    expect(mapsApi.__maps[0].opts.colorScheme).toBeUndefined();
+  });
+
+  // @spec MAP-024, MAP-027
+  it("restyles the existing map in place, constructing no replacement", () => {
+    const mapsApi = createFakeMapsApiWithMaps();
+    const map = createMap(mapsApi, document.createElement("div"), {
+      center: { lat: 41.87, lng: -87.65 },
+      zoom: 12,
+      resolvedTheme: "light",
+    });
+    applyThemeToMap(map, "dark");
+    // The API cannot dispose of a map, so a second construction leaves the
+    // first live and overlays stop attaching — exactly one map, ever.
+    expect(mapsApi.__maps).toHaveLength(1);
+    expect(map.optionUpdates).toHaveLength(1);
+    expect(map.optionUpdates[0].styles.length).toBeGreaterThan(0);
+  });
+
+  // @spec MAP-024
+  it("touches nothing but the styles, so the camera and overlays are left alone", () => {
+    const mapsApi = createFakeMapsApiWithMaps();
+    const map = createMap(mapsApi, document.createElement("div"), {
+      center: { lat: 41.87, lng: -87.65 },
+      zoom: 12,
+      resolvedTheme: "dark",
+    });
+    applyThemeToMap(map, "light");
+    expect(Object.keys(map.optionUpdates[0])).toEqual(["styles"]);
+    expect(map.opts.center).toEqual({ lat: 41.87, lng: -87.65 });
+    expect(map.opts.zoom).toBe(12);
+  });
+
+  // @spec MAP-025
+  it("takes no map action when the theme changes while no map exists", () => {
+    expect(() => applyThemeToMap(null, "dark")).not.toThrow();
+    expect(applyThemeToMap(null, "dark")).toBe(false);
   });
 });

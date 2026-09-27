@@ -12,10 +12,13 @@ import {
 import {
   MapsLoadError,
   buildMapsScriptUrl,
+  applyThemeToMap,
+  createMap,
   loadMapsApi,
   renderPlan,
   resolveClickPriority,
 } from "./map-display.js";
+import { initTheme, wireThemeControl } from "./theme.js";
 import { MAP_CENTER, MAP_ZOOM, MAPS_API_KEY, RACE_DATE } from "./config.js";
 
 // Two markers within ~30 m of each other are treated as a single click target
@@ -72,6 +75,19 @@ async function init() {
   let map = null;
   let courseData = null;
 
+  // The theme starts before the map and course data, and depends on neither, so
+  // the control still works on the pages where the loads below give up.
+  // @spec THEME-033
+  const theme = initTheme({
+    root: document.documentElement,
+    storage: window.localStorage,
+    matchMedia: (query) => window.matchMedia(query),
+    // Repaints the live map; nothing is re-rendered, because nothing is torn
+    // down. @spec MAP-024, MAP-025
+    onResolvedThemeChange: (resolvedTheme) => applyThemeToMap(map, resolvedTheme),
+  });
+  wireThemeControl(document.getElementById("theme-control"), theme, document.documentElement);
+
   const clearRendered = () => {
     rendered.route?.setMap?.(null);
     for (const record of rendered.markerRecords) record.marker.setMap?.(null);
@@ -117,7 +133,8 @@ async function init() {
     return;
   }
 
-  map = new mapsApi.Map(mapEl, { center: MAP_CENTER, zoom: MAP_ZOOM, mapTypeControl: false, streetViewControl: false });
+  // @spec MAP-023
+  map = createMap(mapsApi, mapEl, { center: MAP_CENTER, zoom: MAP_ZOOM, resolvedTheme: theme.getResolved() });
 
   const runPipeline = (state) => {
     triggerPipeline(state, {
@@ -125,12 +142,12 @@ async function init() {
       predictTimes,
       suggestItinerary,
       renderMap: ({ mileMarkerTimes, itinerary }) =>
-        render({ courseMileMarkers: courseData.mileMarkers, mileMarkerTimes, itinerary }),
+        render({ courseRouteGeometry: courseData.routeGeometry, mileMarkerTimes, itinerary }),
     });
   };
 
   const renderBareRoute = () =>
-    render({ courseMileMarkers: courseData.mileMarkers, mileMarkerTimes: null, itinerary: null });
+    render({ courseRouteGeometry: courseData.routeGeometry, mileMarkerTimes: null, itinerary: null });
 
   const { startInput, paceInput, errorEl } = mountForm(formEl, {
     onChange: ({ startRaw, paceRaw }) => {

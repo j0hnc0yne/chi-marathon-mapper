@@ -8,6 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "extract-course-data": "node tools/extract-course-data-cli.mjs",
+    "check-course-data": "node tools/extract-course-data-cli.mjs --check",
     "test:watch": "vitest"
   },
   "devDependencies": {
