@@ -95,7 +95,7 @@ const PAINT_OPS = new Set(["f", "F", "f*", "S", "s", "B", "B*", "b", "b*", "n"])
 
 /**
  * Interprets the drawing operators into paths in page coordinates, carrying the
- * paint operator and colour state each was drawn with — which is how the course
+ * paint operator and color state each was drawn with — which is how the course
  * is told apart from the street network.
  */
 export function parseContentStream(content) {
@@ -237,7 +237,7 @@ const clean = (text) => text.replace(/\\(\d{3}|.)/g, "").trim();
 
 /**
  * The course, identified by the styling it alone is drawn with: a 2pt stroke in
- * the map's spot colour. The same style also draws the scale bar, which is
+ * the map's spot color. The same style also draws the scale bar, which is
  * excluded by length — a 26-mile course is not two points long.
  *
  * @spec COURSE-017

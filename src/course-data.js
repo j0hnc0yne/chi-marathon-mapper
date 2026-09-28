@@ -7,6 +7,18 @@ export class CourseDataError extends Error {
 
 const TRAVEL_MODES = ["walk", "transit"];
 
+/**
+ * Where the course data is fetched from. The version is derived from the data's
+ * own content at build time, so changed data lives at an address no browser has
+ * cached — the built script is named after its contents and so is always fresh,
+ * and without this the data was not, pairing new code with an older file.
+ *
+ * @spec COURSE-032
+ */
+export function courseDataUrl(version) {
+  return `./data/course-data.json?v=${encodeURIComponent(version)}`;
+}
+
 function isFiniteNumber(value) {
   return typeof value === "number" && Number.isFinite(value);
 }

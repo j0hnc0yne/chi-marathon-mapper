@@ -9,9 +9,9 @@
 ## Application
 
 - [x] **THEME-004**: The system shall represent a pinned theme choice as a `data-theme` attribute on the document root, and shall represent the follow-the-system choice by the absence of that attribute.
-- [x] **THEME-005**: The system shall define every themed colour as a CSS custom property selected by the document root's `data-theme` attribute and the `prefers-color-scheme` media query, without code assigning a colour to any surface CSS can reach.
-- [x] **THEME-020**: The system shall define a colour token for every colour it paints, including the page background, the header's secondary text, the input validation error, each message foreground and tinted background, and the map container's placeholder fill.
-- [x] **THEME-021**: The system shall declare an explicit background colour on the page body in both schemes, rather than relying on the user agent's default.
+- [x] **THEME-005**: The system shall define every themed color as a CSS custom property selected by the document root's `data-theme` attribute and the `prefers-color-scheme` media query, without code assigning a color to any surface CSS can reach.
+- [x] **THEME-020**: The system shall define a color token for every color it paints, including the page background, the header's secondary text, the input validation error, each message foreground and tinted background, and the map container's placeholder fill.
+- [x] **THEME-021**: The system shall declare an explicit background color on the page body in both schemes, rather than relying on the user agent's default.
 - [x] **THEME-022**: The system shall declare the CSS `color-scheme` property from the same selectors that choose the palette, so that browser-drawn surfaces — the time input's picker, scrollbars and focus rings — match the rendered theme.
 - [x] **THEME-023**: The system shall write only the values `light` and `dark` to the document root's `data-theme` attribute.
 - [x] **THEME-006**: While light is pinned and the operating system prefers dark, the system shall render the light scheme.
@@ -22,8 +22,8 @@
 - [x] **THEME-008**: When the spectator pins light or dark, the system shall store that choice on the viewer's own device.
 - [x] **THEME-009**: When the spectator chooses to follow the operating system, the system shall remove any stored theme choice rather than storing a value for it.
 - [x] **THEME-010**: The system shall not write the theme choice into the URL query string, and a shared link shall not carry it.
-- [x] **THEME-011**: If reading the stored theme choice fails, or the stored value is not one of the recognised theme choices, then the system shall follow the operating system's preference.
-- [x] **THEME-024**: If the stored theme choice is not one of the recognised theme choices, then the system shall delete it rather than leave it stored.
+- [x] **THEME-011**: If reading the stored theme choice fails, or the stored value is not one of the recognized theme choices, then the system shall follow the operating system's preference.
+- [x] **THEME-024**: If the stored theme choice is not one of the recognized theme choices, then the system shall delete it rather than leave it stored.
 - [x] **THEME-025**: A theme choice made in one browser tab shall not change the theme of another tab already open on the same device until that tab reloads.
 - [x] **THEME-012**: If writing the theme choice to device storage fails, then the system shall apply the chosen theme to the current page view and shall not display an error.
 

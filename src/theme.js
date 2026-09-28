@@ -1,4 +1,4 @@
-// The page's colour scheme: system, light or dark.
+// The page's color scheme: system, light or dark.
 //
 // This is the one piece of state that describes the viewer rather than the plan,
 // which is why it never reaches the URL. See docs/intent/theme/theme-design.md.
@@ -38,7 +38,7 @@ export function readStoredChoice(storage) {
   try {
     storage.removeItem(STORAGE_KEY);
   } catch {
-    // Nothing to do: an unrecognised value that cannot be cleared is still
+    // Nothing to do: an unrecognized value that cannot be cleared is still
     // treated as "system" on every load, which is the correct rendering.
   }
   return "system";

@@ -1,5 +1,5 @@
 /* @spec THEME-005, THEME-016, THEME-020, THEME-021, THEME-022, THEME-028, THEME-029
-   Colour tokens. Declared three times: light on :root, dark under the system
+   Color tokens. Declared three times: light on :root, dark under the system
    preference, and dark again under an explicit pin. The dark values are repeated
    rather than shared because CSS cannot apply one block under two unrelated
    conditions — see docs/intent/theme/theme-design.md.

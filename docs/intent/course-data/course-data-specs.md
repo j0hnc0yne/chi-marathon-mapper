@@ -9,9 +9,9 @@
 
 ## Mile Markers
 
-- [x] **COURSE-001**: The system shall represent labelled distances along the course as an ordered list of mile markers, each carrying a cumulative course distance in miles and a latitude/longitude coordinate.
+- [x] **COURSE-001**: The system shall represent labeled distances along the course as an ordered list of mile markers, each carrying a cumulative course distance in miles and a latitude/longitude coordinate.
 - [x] **COURSE-002**: The mile marker list shall cover at minimum every full mile from 0 through 26, plus the finish at mile 26.2.
-- [x] **COURSE-015**: Each mile marker's coordinates shall lie on the route geometry at the point reached by travelling its mile value of cumulative distance along the route from the start line.
+- [x] **COURSE-015**: Each mile marker's coordinates shall lie on the route geometry at the point reached by traveling its mile value of cumulative distance along the route from the start line.
 
 ## Viewing Spots and Travel Times
 
@@ -20,6 +20,10 @@
 - [x] **COURSE-005**: Each travel-time matrix entry shall record a walking-minutes value and, where available, a transit-minutes value.
 - [x] **COURSE-006**: The travel-time matrix shall not include driving times between viewing spots.
 - [x] **COURSE-010**: Where a curated pair of viewing spots is separated by a physical barrier (the river or rail lines), the travel-time matrix shall still carry a real entry reflecting a route around the barrier, rather than an "unreachable" placeholder.
+
+## Loading
+
+- [x] **COURSE-032**: The system shall fetch the course data from a URL carrying a version derived from the data's content, so that a change to the data changes the URL and cannot be answered from a cached copy of an earlier version.
 
 ## Data Integrity
 

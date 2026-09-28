@@ -1,7 +1,7 @@
 // Verifies the course data actually checked into the repo, not a synthetic
 // fixture. These are the checks that hold the generated artifact to the
 // invariants the extraction guarantees by construction — see course-data's
-// "curation decides whether the data is correct" division of labour. They run
+// "curation decides whether the data is correct" division of labor. They run
 // against the artifact rather than the generator, so a stale committed file
 // fails here even though a fresh extraction would pass.
 import { spawnSync } from "node:child_process";

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CourseDataError, getTravelTime, loadCourseData, resolveNearestMile } from "./course-data.js";
+import { CourseDataError, courseDataUrl, getTravelTime, loadCourseData, resolveNearestMile } from "./course-data.js";
 import {
   makeFullCourseMileMarkers,
   makeRouteGeometry,
@@ -162,5 +162,34 @@ describe("route geometry", () => {
   it("loads course data that carries no provenance entry, which is documentation rather than a required field", () => {
     expect(() => loadCourseData(valid())).not.toThrow();
     expect(() => loadCourseData({ ...valid(), _provenance: undefined })).not.toThrow();
+  });
+});
+
+describe("courseDataUrl", () => {
+  // @spec COURSE-032
+  it("carries the data's version, so a cache holding an earlier version cannot answer", () => {
+    const before = courseDataUrl("a1b2c3");
+    const after = courseDataUrl("d4e5f6");
+    expect(before).toContain("a1b2c3");
+    expect(before).not.toEqual(after);
+  });
+
+  // @spec COURSE-032
+  it("still points at the course data file", () => {
+    expect(courseDataUrl("a1b2c3").split("?")[0]).toBe("./data/course-data.json");
+  });
+});
+
+describe("the build's course-data version", () => {
+  // @spec COURSE-032
+  it("is derived from the committed data file's content", async () => {
+    const { createHash } = await import("node:crypto");
+    const { readFileSync } = await import("node:fs");
+    const config = (await import("../vite.config.js")).default;
+    const expected = createHash("sha256")
+      .update(readFileSync(new URL("../public/data/course-data.json", import.meta.url)))
+      .digest("hex")
+      .slice(0, 12);
+    expect(config.define.__COURSE_DATA_VERSION__).toBe(JSON.stringify(expected));
   });
 });
