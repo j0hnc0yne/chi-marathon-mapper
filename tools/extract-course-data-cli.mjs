@@ -62,7 +62,7 @@ const median = (values) => {
 function findLabel(labels, text, axis) {
   const matches = labels.filter((l) => l.text === text);
   if (matches.length === 0) return null;
-  // A street can be labelled several times along its length; the median of
+  // A street can be labeled several times along its length; the median of
   // those placements is steadier than any single one.
   return median(matches.map((l) => (axis === "eastWest" ? l.y : l.x)));
 }

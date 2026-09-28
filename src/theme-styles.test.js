@@ -1,4 +1,4 @@
-// Verifies the stylesheet and the served markup, not behaviour. The theme's
+// Verifies the stylesheet and the served markup, not behavior. The theme's
 // mechanism is CSS — the palette, the scheme declaration and the pre-paint
 // script — so these are the only place those specs can be checked.
 import { readFileSync } from "node:fs";
@@ -179,7 +179,7 @@ describe("independence from the rest of the page", () => {
   });
 
   // @spec THEME-033
-  it("is initialised before the course data and Maps loads that can abort startup", () => {
+  it("is initialized before the course data and Maps loads that can abort startup", () => {
     const main = readFileSync(new URL("./main.js", import.meta.url), "utf8");
     const themeStart = main.indexOf("initTheme({");
     const controlWired = main.indexOf("wireThemeControl(");

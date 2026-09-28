@@ -22,8 +22,8 @@
 - [x] **THEME-008**: When the spectator pins light or dark, the system shall store that choice on the viewer's own device.
 - [x] **THEME-009**: When the spectator chooses to follow the operating system, the system shall remove any stored theme choice rather than storing a value for it.
 - [x] **THEME-010**: The system shall not write the theme choice into the URL query string, and a shared link shall not carry it.
-- [x] **THEME-011**: If reading the stored theme choice fails, or the stored value is not one of the recognised theme choices, then the system shall follow the operating system's preference.
-- [x] **THEME-024**: If the stored theme choice is not one of the recognised theme choices, then the system shall delete it rather than leave it stored.
+- [x] **THEME-011**: If reading the stored theme choice fails, or the stored value is not one of the recognized theme choices, then the system shall follow the operating system's preference.
+- [x] **THEME-024**: If the stored theme choice is not one of the recognized theme choices, then the system shall delete it rather than leave it stored.
 - [x] **THEME-025**: A theme choice made in one browser tab shall not change the theme of another tab already open on the same device until that tab reloads.
 - [x] **THEME-012**: If writing the theme choice to device storage fails, then the system shall apply the chosen theme to the current page view and shall not display an error.
 

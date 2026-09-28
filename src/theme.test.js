@@ -126,7 +126,7 @@ describe("persistence", () => {
   });
 
   // @spec THEME-011
-  it("follows the system preference when the stored value is unrecognised", () => {
+  it("follows the system preference when the stored value is unrecognized", () => {
     for (const bad of ["Dark", "", "sepia", "system", "{}"]) {
       const { theme } = setup({ stored: { "chi-marathon-theme": bad }, prefersDark: true });
       expect(theme.getResolved()).toBe("dark");
@@ -141,7 +141,7 @@ describe("persistence", () => {
   });
 
   // @spec THEME-024
-  it("deletes an unrecognised stored value rather than leaving it to recur", () => {
+  it("deletes an unrecognized stored value rather than leaving it to recur", () => {
     const { storage } = setup({ stored: { "chi-marathon-theme": "sepia" } });
     expect(Object.keys(storage.store)).toHaveLength(0);
   });
@@ -250,14 +250,14 @@ describe("reporting the resolved theme", () => {
 
 describe("readStoredChoice", () => {
   // @spec THEME-011, THEME-024
-  it("returns the system choice and clears storage for anything unrecognised", () => {
+  it("returns the system choice and clears storage for anything unrecognized", () => {
     const storage = fakeStorage({ "chi-marathon-theme": "chartreuse" });
     expect(readStoredChoice(storage)).toBe("system");
     expect(Object.keys(storage.store)).toHaveLength(0);
   });
 
   // @spec THEME-011
-  it("returns a recognised stored choice unchanged", () => {
+  it("returns a recognized stored choice unchanged", () => {
     expect(readStoredChoice(fakeStorage({ "chi-marathon-theme": "light" }))).toBe("light");
     expect(readStoredChoice(fakeStorage({ "chi-marathon-theme": "dark" }))).toBe("dark");
   });

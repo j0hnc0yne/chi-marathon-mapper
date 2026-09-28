@@ -9,9 +9,9 @@
 
 ## Mile Markers
 
-- [x] **COURSE-001**: The system shall represent labelled distances along the course as an ordered list of mile markers, each carrying a cumulative course distance in miles and a latitude/longitude coordinate.
+- [x] **COURSE-001**: The system shall represent labeled distances along the course as an ordered list of mile markers, each carrying a cumulative course distance in miles and a latitude/longitude coordinate.
 - [x] **COURSE-002**: The mile marker list shall cover at minimum every full mile from 0 through 26, plus the finish at mile 26.2.
-- [x] **COURSE-015**: Each mile marker's coordinates shall lie on the route geometry at the point reached by travelling its mile value of cumulative distance along the route from the start line.
+- [x] **COURSE-015**: Each mile marker's coordinates shall lie on the route geometry at the point reached by traveling its mile value of cumulative distance along the route from the start line.
 
 ## Viewing Spots and Travel Times
 

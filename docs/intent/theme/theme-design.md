@@ -19,7 +19,7 @@ The spectator's choice is one of:
 - **Light** — pinned light, regardless of the system preference.
 - **Dark** — pinned dark, regardless of the system preference.
 
-System is a real, reachable state rather than merely the initial value: a viewer who pins dark in the evening and later wants their machine's sunrise switch honoured again has to be able to get back to it.
+System is a real, reachable state rather than merely the initial value: a viewer who pins dark in the evening and later wants their machine's sunrise switch honored again has to be able to get back to it.
 
 The **resolved theme** — the one actually painted — is always light or dark. Under System it is whatever the operating system currently reports; under a pin it is the pinned value.
 
@@ -46,7 +46,7 @@ One case is easy to miss. Switching from a pinned theme back to System changes t
 
 ## Independence From the Rest of the Page
 
-This component starts up on its own, before and regardless of the app's data and map dependencies. The module that wires the rest of the page abandons setup when course data or the Google Maps API fails to load, and both of those failures leave a page the spectator still reads — an error message they may well be reading at night. A toggle whose markup is served but whose behaviour was wired inside the abandoned path would sit there looking operable and do nothing.
+This component starts up on its own, before and regardless of the app's data and map dependencies. The module that wires the rest of the page abandons setup when course data or the Google Maps API fails to load, and both of those failures leave a page the spectator still reads — an error message they may well be reading at night. A toggle whose markup is served but whose behavior was wired inside the abandoned path would sit there looking operable and do nothing.
 
 So the theme's storage read, attribute application and control wiring depend on nothing but the document. Nothing in this component needs course data, the map, or the plan.
 
@@ -54,7 +54,7 @@ So the theme's storage read, attribute application and control wiring depend on 
 
 The pinned choice is stored on the viewer's own device, under a single key. Choosing System removes the key rather than storing a third value, so "no stored preference" and "follow the system" are the same state with one representation instead of two that could disagree.
 
-Only `light` and `dark` are legal stored values. Anything else — an empty string, a differently-cased variant, a value from an older or newer build, something typed into devtools — is not a choice this component recognises, so it is treated as System and deleted on read. Deleting it matters: left in place, an unrecognised value would be re-read and re-rejected on every load, and a later build that happened to recognise it would silently resurrect a choice the spectator never made.
+Only `light` and `dark` are legal stored values. Anything else — an empty string, a differently-cased variant, a value from an older or newer build, something typed into devtools — is not a choice this component recognizes, so it is treated as System and deleted on read. Deleting it matters: left in place, an unrecognized value would be re-read and re-rejected on every load, and a later build that happened to recognize it would silently resurrect a choice the spectator never made.
 
 Device storage is not always available — a private window, or blocked site data, can make a read come back empty or make either a read or a write raise. None of that is an error worth showing a spectator, so a failure to read resolves to System, and a failure to write leaves the toggle working for the current page view without the choice surviving a reload. That includes a failed *removal*: choosing System applies immediately, but if the delete does not land, the old pin is still there on the next load. The page is fully usable in every one of those cases; the only thing lost is memory of the choice.
 
@@ -62,7 +62,7 @@ A choice made in one tab does not reach another tab already open on the same dev
 
 ## The Toggle Control
 
-A three-option control, labelled for each state, placed in the page header and deliberately *not* inside the inputs form. The form holds the plan; the theme is not part of the plan, and putting them together would invite exactly the confusion the tenet exists to prevent — that changing the theme changes the plan, or belongs in the shared link.
+A three-option control, labeled for each state, placed in the page header and deliberately *not* inside the inputs form. The form holds the plan; the theme is not part of the plan, and putting them together would invite exactly the confusion the tenet exists to prevent — that changing the theme changes the plan, or belongs in the shared link.
 
 The control is a radio group rather than a cycling button, so the current state and the available states are both visible at once, and so it is reachable and operable by keyboard and screen reader without custom key handling. The group carries its own accessible name in addition to the three option labels, so a screen reader announces what the options belong to.
 
@@ -92,12 +92,12 @@ Notification matters in a case the CSS handles invisibly: while the choice is Sy
 | Where the pin is applied | An inline script in the document head | The existing module entry point at the end of the body; a `<link>` with a media attribute | A module runs after first paint, so a pinned-dark viewer sees a white flash on every load. The head script is an exception to how the rest of the project loads code, and it is the flash that justifies it. |
 | Device storage unavailable or throwing | Resolve to System; keep the toggle working for the current view | Show the spectator an error; disable the toggle | Nothing about the plan depends on the theme, so a storage failure has no consequence worth a spectator's attention. Disabling the toggle would turn a private window into a degraded page for no reason. |
 | Toggle placement | Page header, outside the inputs form | Inside the inputs form with start time and pace | The form is the plan, and the plan is what the URL carries. Putting a non-plan control among the plan's fields blurs the one distinction this component exists to hold. |
-| Toggle control shape | A labelled three-option radio group | A single button that cycles through the states; a two-position switch plus a separate "use system" reset | A radio group shows the current state and the alternatives simultaneously, and gets keyboard and screen-reader behaviour from the platform. A cycling button hides both what is selected and what comes next. |
+| Toggle control shape | A labeled three-option radio group | A single button that cycles through the states; a two-position switch plus a separate "use system" reset | A radio group shows the current state and the alternatives simultaneously, and gets keyboard and screen-reader behavior from the platform. A cycling button hides both what is selected and what comes next. |
 | How map display learns the theme | This component exposes the resolved theme and notifies on change | Map display reads device storage and the media query itself | Two components resolving the same three-state rule from the same raw inputs is one rule implemented twice, free to drift. Resolution lives here; rendering lives there. |
 | Watching the system preference | Only while the choice is System | Always; never | Under a pin the system preference cannot affect the resolved theme, so watching it would deliver changes that must then be ignored. Never watching leaves the map stale when the system switches under a System choice. |
 | Where the toggle's markup comes from | Served in the page's HTML | Mounted by the module entry point, like the inputs form | The entry point abandons setup when course data or the Maps API fails, before it would mount a toggle — leaving the control missing in the degraded states this component claims stay usable. Served markup also removes any window where the control is absent or shows the wrong option. |
 | Source of the control's selected option | The root attribute | A second read of device storage | The attribute is what the page is actually painted from. A second read can disagree with it — a raised pre-paint read leaves the page in System while a later read returns a pin — and the control would then contradict what the spectator sees. |
-| Unrecognised stored value | Treated as System and deleted | Treated as System and left in place; treated as an error | Leaving it means re-reading and re-rejecting it on every load, and risks a later build resurrecting a choice the spectator never made. It is not worth an error, because the page renders correctly either way. |
+| Unrecognized stored value | Treated as System and deleted | Treated as System and left in place; treated as an error | Leaving it means re-reading and re-rejecting it on every load, and risks a later build resurrecting a choice the spectator never made. It is not worth an error, because the page renders correctly either way. |
 | Theming native browser surfaces (time picker, scrollbars, focus rings) | Declare the CSS `color-scheme` property from the same selectors as the palette | Restyle the controls with custom properties; leave them in the browser's default scheme | Custom properties cannot reach browser-drawn chrome at all. Under a pin, `prefers-color-scheme` no longer matches the painted page, so without declaring the scheme a dark page keeps a white time picker and light scrollbars. |
 | A choice made in another open tab | Not propagated; each tab keeps the choice it resolved at load | Propagate live via a storage event | A second cross-tab path into the transition, for two tabs of a one-page planner being re-themed while both are open. They agree again after a reload. |
 | Dark-scheme semantic colors | Chosen deliberately per color | Derived from the light values by inversion or lightness flip | The message styles are dark text on pale tints; inverting sends tint and text to near-black together. There is no mechanical transform that keeps a tinted-background pattern legible. |
@@ -106,7 +106,7 @@ Notification matters in a case the CSS handles invisibly: while the choice is Sy
 
 ### Deferred
 1. The concrete palette values for each scheme — a visual-design detail, constrained by the contrast floor above but not determined by it.
-2. Whether the toggle should also offer a high-contrast variant. The platform reports more than light and dark — contrast preference and forced-colors mode among them — so the three states cover the light/dark axis rather than every accessibility preference available. Nobody has asked for more, and the page inherits forced-colors behaviour from the browser either way.
+2. Whether the toggle should also offer a high-contrast variant. The platform reports more than light and dark — contrast preference and forced-colors mode among them — so the three states cover the light/dark axis rather than every accessibility preference available. Nobody has asked for more, and the page inherits forced-colors behavior from the browser either way.
 
 ## References
 

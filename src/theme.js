@@ -38,7 +38,7 @@ export function readStoredChoice(storage) {
   try {
     storage.removeItem(STORAGE_KEY);
   } catch {
-    // Nothing to do: an unrecognised value that cannot be cleared is still
+    // Nothing to do: an unrecognized value that cannot be cleared is still
     // treated as "system" on every load, which is the correct rendering.
   }
   return "system";

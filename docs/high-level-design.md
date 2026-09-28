@@ -72,7 +72,7 @@ flowchart LR
     URLSTATE -. share link .-> IN
 ```
 
-- **Course route geometry**: the traced path of the course itself — an ordered list of coordinates dense enough to follow the streets through every turn — extracted from the official course map and checked into the repo. Distinct from mile markers: geometry is what the route line is drawn from, mile markers are the labelled points along it.
+- **Course route geometry**: the traced path of the course itself — an ordered list of coordinates dense enough to follow the streets through every turn — extracted from the official course map and checked into the repo. Distinct from mile markers: geometry is what the route line is drawn from, mile markers are the labeled points along it.
 - **Course data**: static dataset of mile-marker coordinates for the 2026 Chicago Marathon course, positioned by cumulative distance along the route geometry, checked into the repo.
 - **Viewing spots**: a curated static list of spectator-accessible points along or near the course, not necessarily one per mile, each tied to a nearby mile marker.
 - **Travel-time matrix**: static, precomputed (offline, one-time) walking and transit travel times between every pair of curated viewing spots.
