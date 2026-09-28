@@ -96,6 +96,14 @@ The data file records its provenance in a top-level entry naming the source PDF 
 
 Provenance says where the data came from but cannot show that the file still matches it, so continuous integration re-runs the extraction and fails if the result differs from the committed file. This closes the one gap the by-construction argument leaves open: a hand-edit to the generated data after the fact, which no runtime check and no amount of documentation would catch.
 
+## Loading
+
+The data is fetched at page load from a URL carrying a version that changes whenever the data changes.
+
+This exists because code and data are cached independently. The built script is named after its own contents, so a new deployment always fetches new code; the data file's address never changed, so a browser holding a cached copy kept serving it. That pairs the newest code with an older data file, and the two can disagree — a build that requires route geometry meeting a cached file recorded before route geometry existed. The mismatch surfaces as the invalid-data error below, which is the right response to data the code cannot use, but the spectator sees a broken page for a discrepancy that is purely an artefact of caching.
+
+Versioning the URL removes the possibility rather than shortening the window: a data file the running code has never seen is at an address no cache holds. The version is derived from the data's own content at build time, so it changes exactly when the data does and not on every rebuild.
+
 ## Data Integrity
 
 All four data sets live in one JSON file, curated once, offline, and are expected to already be internally consistent by the time they ship. A failure in any of them fails the whole load — the file is one document, and a plan missing any one data set is not a plan.

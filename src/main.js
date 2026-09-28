@@ -1,4 +1,4 @@
-import { CourseDataError, loadCourseData } from "./course-data.js";
+import { CourseDataError, courseDataUrl, loadCourseData } from "./course-data.js";
 import { predictTimes } from "./pace-predictor.js";
 import { suggestItinerary } from "./itinerary-suggester.js";
 import {
@@ -41,7 +41,8 @@ function injectMapsScript() {
 }
 
 async function fetchCourseData() {
-  const response = await fetch("./data/course-data.json");
+  // @spec COURSE-032
+  const response = await fetch(courseDataUrl(__COURSE_DATA_VERSION__));
   if (!response.ok) {
     throw new CourseDataError(`Course data could not be fetched (HTTP ${response.status})`);
   }

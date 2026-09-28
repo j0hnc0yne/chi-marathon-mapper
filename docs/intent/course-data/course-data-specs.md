@@ -21,6 +21,10 @@
 - [x] **COURSE-006**: The travel-time matrix shall not include driving times between viewing spots.
 - [x] **COURSE-010**: Where a curated pair of viewing spots is separated by a physical barrier (the river or rail lines), the travel-time matrix shall still carry a real entry reflecting a route around the barrier, rather than an "unreachable" placeholder.
 
+## Loading
+
+- [x] **COURSE-032**: The system shall fetch the course data from a URL carrying a version derived from the data's content, so that a change to the data changes the URL and cannot be answered from a cached copy of an earlier version.
+
 ## Data Integrity
 
 - [x] **COURSE-007**: If a course data file fails to parse, or a record is missing a required field, then the system shall display an error rather than proceeding with the load.
