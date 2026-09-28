@@ -19,7 +19,7 @@ export async function loadMapsApi(scriptLoader) {
   }
 }
 
-// The Maps API accepts a colour scheme only when a map is constructed, so the
+// The Maps API accepts a color scheme only when a map is constructed, so the
 // resolved theme is a construction argument and a theme change means a new map.
 // Its own FOLLOW_SYSTEM would honour the OS and ignore a pin, which is exactly
 // the case a pin exists for.
@@ -47,7 +47,7 @@ function mapStyleFor(resolvedTheme) {
   return resolvedTheme === "dark" ? DARK_MAP_STYLE : [];
 }
 
-// The Maps API's own colour-scheme option is construction-only, and the API
+// The Maps API's own color-scheme option is construction-only, and the API
 // cannot dispose of a map — so honouring a theme change through it would mean
 // building a second map beside a live first one, which stops overlays
 // attaching. A palette applied in place needs only one map, ever.

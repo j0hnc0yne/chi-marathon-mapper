@@ -58,9 +58,9 @@ const NON_TEXT_PAIRS = [
   ["--color-focus-ring", "--color-background", 3],
 ];
 
-describe("the colour palette", () => {
+describe("the color palette", () => {
   // @spec THEME-020
-  it("declares a token for every colour the page paints", () => {
+  it("declares a token for every color the page paints", () => {
     const light = SCHEMES.light();
     for (const token of [
       "--color-background",
@@ -95,9 +95,9 @@ describe("the colour palette", () => {
   });
 
   // @spec THEME-005
-  it("uses no literal colour outside the token declarations", () => {
-    // Everything after the token blocks should reference tokens, so a colour
-            // left hardcoded is a light-scheme colour that survives into dark mode.
+  it("uses no literal color outside the token declarations", () => {
+    // Everything after the token blocks should reference tokens, so a color
+            // left hardcoded is a light-scheme color that survives into dark mode.
     const afterTokens = css.slice(css.lastIndexOf('[data-theme="dark"]'));
     const body = afterTokens.slice(afterTokens.indexOf("}") + 1);
     const literals = body.match(/#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/g) ?? [];

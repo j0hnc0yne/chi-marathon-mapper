@@ -395,7 +395,7 @@ describe("Google Maps API loading", () => {
   });
 });
 
-describe("colour scheme", () => {
+describe("color scheme", () => {
   // A fake Maps API recording every Map constructed and every setOptions call.
   function createFakeMapsApiWithMaps() {
     const maps = [];

@@ -24,9 +24,9 @@
 - [x] **MAP-010**: If the Google Maps JavaScript API fails to load, then the system shall display an explicit error rather than an unexplained blank map area.
 - [x] **MAP-011**: The system shall load the Google Maps JavaScript API using a client-side API key restricted by HTTP referrer to the GitHub Pages origin.
 
-## Colour Scheme
+## Color Scheme
 
-- [x] **MAP-023**: The system shall style the map to match the resolved theme reported by the theme component (THEME-017), rather than using the Maps API's own follow-the-system colour scheme.
+- [x] **MAP-023**: The system shall style the map to match the resolved theme reported by the theme component (THEME-017), rather than using the Maps API's own follow-the-system color scheme.
 - [x] **MAP-024**: When the resolved theme changes (THEME-018 or THEME-030), the system shall apply the new theme's palette to the existing map without constructing a replacement, leaving the camera, the route, the mile markers and the suggested stops in place.
 - [x] **MAP-025**: If the resolved theme changes while no map exists, because the Google Maps API failed to load (MAP-010) or course data failed to validate (MAP-012), then the system shall take no map action and shall leave the displayed error in place.
 - [x] **MAP-027**: The system shall construct exactly one map over the lifetime of a page view.

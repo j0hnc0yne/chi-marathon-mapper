@@ -1,4 +1,4 @@
-// The page's colour scheme: system, light or dark.
+// The page's color scheme: system, light or dark.
 //
 // This is the one piece of state that describes the viewer rather than the plan,
 // which is why it never reaches the URL. See docs/intent/theme/theme-design.md.

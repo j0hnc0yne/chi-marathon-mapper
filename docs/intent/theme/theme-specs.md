@@ -9,9 +9,9 @@
 ## Application
 
 - [x] **THEME-004**: The system shall represent a pinned theme choice as a `data-theme` attribute on the document root, and shall represent the follow-the-system choice by the absence of that attribute.
-- [x] **THEME-005**: The system shall define every themed colour as a CSS custom property selected by the document root's `data-theme` attribute and the `prefers-color-scheme` media query, without code assigning a colour to any surface CSS can reach.
-- [x] **THEME-020**: The system shall define a colour token for every colour it paints, including the page background, the header's secondary text, the input validation error, each message foreground and tinted background, and the map container's placeholder fill.
-- [x] **THEME-021**: The system shall declare an explicit background colour on the page body in both schemes, rather than relying on the user agent's default.
+- [x] **THEME-005**: The system shall define every themed color as a CSS custom property selected by the document root's `data-theme` attribute and the `prefers-color-scheme` media query, without code assigning a color to any surface CSS can reach.
+- [x] **THEME-020**: The system shall define a color token for every color it paints, including the page background, the header's secondary text, the input validation error, each message foreground and tinted background, and the map container's placeholder fill.
+- [x] **THEME-021**: The system shall declare an explicit background color on the page body in both schemes, rather than relying on the user agent's default.
 - [x] **THEME-022**: The system shall declare the CSS `color-scheme` property from the same selectors that choose the palette, so that browser-drawn surfaces — the time input's picker, scrollbars and focus rings — match the rendered theme.
 - [x] **THEME-023**: The system shall write only the values `light` and `dark` to the document root's `data-theme` attribute.
 - [x] **THEME-006**: While light is pinned and the operating system prefers dark, the system shall render the light scheme.

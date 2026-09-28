@@ -20,7 +20,7 @@ Given a runner's start time and average per-mile pace, compute the estimated clo
 - Alongside the map, present the same predicted mile-marker times and suggested stops as a chronological list, so the plan is readable without interacting with map markers.
 - Produce a short, ordered list of suggested viewing spots reachable in sequence, each with its expected travel/wait slack.
 - Produce a shareable URL that reproduces the same plan for another viewer, with no server round-trip required.
-- Render legibly in either a light or a dark colour scheme, following the viewer's system preference unless they choose otherwise.
+- Render legibly in either a light or a dark color scheme, following the viewer's system preference unless they choose otherwise.
 - Run entirely as static files servable from GitHub Pages — no backend, no build-time secrets required to view the page.
 
 ## Non-Goals
@@ -36,7 +36,7 @@ Given a runner's start time and average per-mile pace, compute the estimated clo
 - **Static data over live API calls on the request-day critical path.** Marathon morning is exactly when spectator traffic peaks; leaning on live third-party API calls for the core recommendation logic risks quota exhaustion or rate-limiting at the worst possible time.
 - **A plausible plan beats a precise one.** Pace varies mile to mile in reality; the tool is a planning aid built on a constant-pace assumption, not a guarantee. When a choice trades UI or computational complexity for marginal accuracy, favor simplicity.
 - **Course geometry is read from the official map, never inferred.** Where the course physically runs is a published fact, not an estimate; a spectator standing on the wrong street has no plan at all. This is the one place the "plausible beats precise" tenet above does not reach — that tenet governs *predictions* (pace, travel times), which are estimates by nature, not the course's physical geometry, which is not.
-- **The plan lives in the URL, not a server.** Any input that determines the plan — the runner's start time and pace — must be reproducible by another viewer from the link alone, with no accounts and no server-side session state. Display preferences are the deliberate exception: they belong to the person looking at the page, not to the plan, so they never travel in a shared link. A spectator who sends their plan to a friend is sending the plan, not their taste in colour schemes.
+- **The plan lives in the URL, not a server.** Any input that determines the plan — the runner's start time and pace — must be reproducible by another viewer from the link alone, with no accounts and no server-side session state. Display preferences are the deliberate exception: they belong to the person looking at the page, not to the plan, so they never travel in a shared link. A spectator who sends their plan to a friend is sending the plan, not their taste in color schemes.
 
 ## System Design
 
@@ -79,7 +79,7 @@ flowchart LR
 - **Pace predictor**: a pure client-side function mapping start time, pace, and mile-marker distance to an estimated clock time at each marker.
 - **Itinerary suggester**: a pure client-side function that, given predicted times at each viewing spot and the travel-time matrix, selects a feasible ordered sequence of spots — each reachable before the runner arrives, with slack.
 - **Map display**: the Google Maps JavaScript API draws the route from the course route geometry and drops time-labeled dots at mile markers and suggested spots. This is the one live third-party dependency the page has, used only for rendering; it requires a client-side Maps API key restricted by HTTP referrer to the GitHub Pages domain. Below the map, the same predicted mile-marker times and itinerary stops are also rendered as a chronological text list, giving the spectator a scannable, non-map view of the identical plan.
-- **Theme**: the page's colour scheme, either following the viewer's operating-system preference or pinned to light or dark by a toggle. The choice is remembered on the viewer's own device rather than in the URL, because it describes the viewer and not the plan. Map display reads it too, so the embedded map is restyled to match rather than staying bright inside a dark page.
+- **Theme**: the page's color scheme, either following the viewer's operating-system preference or pinned to light or dark by a toggle. The choice is remembered on the viewer's own device rather than in the URL, because it describes the viewer and not the plan. Map display reads it too, so the embedded map is restyled to match rather than staying bright inside a dark page.
 - **Share link**: the inputs that determine the plan (start time, pace) are serialized to URL query parameters. Loading the page with those parameters pre-populates the form and deterministically re-derives everything else.
 
 ## Key Design Decisions

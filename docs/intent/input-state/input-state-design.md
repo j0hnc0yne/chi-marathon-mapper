@@ -25,7 +25,7 @@ State flows in both directions:
 
 Input state is the sole owner of triggering *computation* of the plan. Whenever the form holds a valid start time and pace — whether that validity was just reached via a page load with valid query parameters, or via a subsequent in-page edit — input state invokes pace predictor, then itinerary suggester, then map display, in that order, to refresh the displayed plan. No other component polls or independently decides when to recompute; a valid start+pace pair existing in input state is the one trigger condition for deriving predicted times and an itinerary.
 
-Not everything that reaches map display is a recompute, and what is not is not input state's to trigger. A change of colour scheme, for instance, repaints the map without any input having changed: map display is told directly by the theme component, and no prediction or itinerary is derived again. Input state owns when the plan changes; it does not own everything that happens to the display.
+Not everything that reaches map display is a recompute, and what is not is not input state's to trigger. A change of color scheme, for instance, repaints the map without any input having changed: map display is told directly by the theme component, and no prediction or itinerary is derived again. Input state owns when the plan changes; it does not own everything that happens to the display.
 
 ## Decisions & Alternatives
 
