@@ -1,0 +1,314 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Coyne Line</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: single-column betting board — masthead, headline line, prop rails, form table. Chicago flag palette. */
+  :root{
+    --paper:#F2EFE9;
+    --card:#FFFFFF;
+    --ink:#10212E;
+    --ink-soft:#566775;
+    --rule:#D6D0C5;
+    --chi-blue:#0B7FA8;
+    --chi-red:#C8102E;
+    --gold:#9A6A14;
+    --over:#B2341F;
+    --under:#1F6B4A;
+
+    --display:"Big Shoulders Display","Oswald","Arial Narrow",system-ui,sans-serif;
+    --body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0B1822;
+      --card:#122634;
+      --ink:#EDE8DF;
+      --ink-soft:#94A7B4;
+      --rule:#1E3341;
+      --chi-blue:#45BCEC;
+      --chi-red:#F46074;
+      --gold:#E3AE52;
+      --over:#F08A6E;
+      --under:#5FCB9B;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0B1822;
+    --card:#122634;
+    --ink:#EDE8DF;
+    --ink-soft:#94A7B4;
+    --rule:#1E3341;
+    --chi-blue:#45BCEC;
+    --chi-red:#F46074;
+    --gold:#E3AE52;
+    --over:#F08A6E;
+    --under:#5FCB9B;
+    color-scheme: dark;
+  }
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:15px;
+    line-height:1.55;
+    padding-inline:18px;
+    padding-block:28px 40px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin-inline:auto;display:flex;flex-direction:column;gap:30px}
+
+  /* masthead */
+  .masthead{display:flex;flex-direction:column;gap:9px}
+  .stars{display:flex;gap:7px}
+  .stars svg{width:20px;height:20px;flex:none}
+  .stars polygon{fill:var(--chi-red)}
+  h1{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(44px,13vw,76px);
+    line-height:.88;
+    letter-spacing:-.01em;
+    margin:0;
+    text-wrap:balance;
+    text-transform:uppercase;
+  }
+  .sub{
+    margin:0;
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+  }
+  .bars{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+  .bars span{height:4px;background:var(--chi-blue);border-radius:2px}
+
+  /* the line */
+  .line{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:4px;
+    padding:22px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    align-items:center;
+    text-align:center;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0;
+  }
+  .number{
+    font-family:var(--display);
+    font-weight:800;
+    font-size:clamp(56px,17vw,96px);
+    line-height:.85;
+    letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums;
+    color:var(--gold);
+  }
+  .sides{display:flex;gap:10px;width:100%;max-width:420px}
+  .side{
+    flex:1;min-width:0;
+    border:1px solid var(--rule);
+    border-radius:3px;
+    padding:11px 8px;
+    display:flex;flex-direction:column;gap:3px;
+  }
+  .side b{
+    font-family:var(--display);
+    font-weight:700;font-size:21px;letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .side.o b{color:var(--over)}
+  .side.u b{color:var(--under)}
+  .side span{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums}
+  .move{
+    font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);
+    letter-spacing:.03em;margin:0;
+  }
+  .move i{font-style:normal;color:var(--chi-red);font-weight:600}
+
+  /* conditions */
+  .conds{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  @media (max-width:520px){.conds{grid-template-columns:repeat(2,1fr)}}
+  .cond{
+    border-top:3px solid var(--chi-blue);
+    background:var(--card);
+    padding:11px 11px 13px;
+    display:flex;flex-direction:column;gap:2px;min-width:0;
+  }
+  .cond dt{
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-soft);
+  }
+  .cond dd{
+    margin:0;font-family:var(--display);font-weight:700;font-size:26px;
+    line-height:1;font-variant-numeric:tabular-nums;
+  }
+  .cond small{font-size:11px;font-family:var(--body);color:var(--ink-soft);font-weight:400}
+
+  /* sections */
+  section{display:flex;flex-direction:column;gap:12px}
+  h2{
+    font-family:var(--display);font-weight:700;
+    font-size:27px;line-height:1;margin:0;text-transform:uppercase;
+    letter-spacing:.01em;
+    padding-bottom:7px;border-bottom:2px solid var(--ink);
+  }
+  h3{
+    font-family:var(--mono);font-weight:600;font-size:11px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--chi-blue);
+    margin:10px 0 0;
+  }
+  .rail{display:flex;flex-direction:column}
+  .bet{
+    display:flex;align-items:baseline;gap:12px;
+    padding:9px 2px;border-bottom:1px solid var(--rule);
+  }
+  .bet p{margin:0;flex:1;min-width:0}
+  .bet .odds{
+    font-family:var(--mono);font-weight:600;font-size:15px;
+    font-variant-numeric:tabular-nums;flex:none;width:62px;text-align:right;
+  }
+  .bet .pct{
+    font-family:var(--mono);font-size:12px;color:var(--ink-soft);
+    font-variant-numeric:tabular-nums;flex:none;width:40px;text-align:right;
+  }
+  .plus{color:var(--under)}
+  .minus{color:var(--over)}
+
+  /* form table */
+  .scroller{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:440px;font-variant-numeric:tabular-nums}
+  th,td{text-align:right;padding:7px 9px;border-bottom:1px solid var(--rule);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left}
+  thead th{
+    font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--ink-soft);font-weight:500;
+  }
+  tbody td{font-family:var(--mono);font-size:13px}
+  tbody tr.key td{background:color-mix(in srgb,var(--chi-blue) 11%,transparent);font-weight:600}
+  td.note{font-family:var(--body);font-size:12px;color:var(--ink-soft);white-space:normal}
+
+  /* read */
+  .read{background:var(--card);border-left:3px solid var(--gold);padding:15px 16px;display:flex;flex-direction:column;gap:9px}
+  .read p{margin:0}
+  .read strong{color:var(--gold)}
+
+  footer{
+    border-top:1px solid var(--rule);padding-top:14px;
+    font-family:var(--mono);font-size:11px;line-height:1.6;
+    color:var(--ink-soft);letter-spacing:.02em;
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="stars" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><polygon points="12,1 14.3,8.02 21.53,6.5 16.6,12 21.53,17.5 14.3,15.98 12,23 9.7,15.98 2.47,17.5 7.4,12 2.47,6.5 9.7,8.02"/></svg>
+      <svg viewBox="0 0 24 24"><polygon points="12,1 14.3,8.02 21.53,6.5 16.6,12 21.53,17.5 14.3,15.98 12,23 9.7,15.98 2.47,17.5 7.4,12 2.47,6.5 9.7,8.02"/></svg>
+      <svg viewBox="0 0 24 24"><polygon points="12,1 14.3,8.02 21.53,6.5 16.6,12 21.53,17.5 14.3,15.98 12,23 9.7,15.98 2.47,17.5 7.4,12 2.47,6.5 9.7,8.02"/></svg>
+      <svg viewBox="0 0 24 24"><polygon points="12,1 14.3,8.02 21.53,6.5 16.6,12 21.53,17.5 14.3,15.98 12,23 9.7,15.98 2.47,17.5 7.4,12 2.47,6.5 9.7,8.02"/></svg>
+    </div>
+    <h1>The Coyne Line</h1>
+    <p class="sub">Chicago Marathon · Sun Oct 11, 2026 · 8:00 AM wave · First marathon</p>
+    <div class="bars"><span></span><span></span></div>
+  </header>
+
+  <div class="line">
+    <p class="eyebrow">Finishing time — over / under</p>
+    <div class="number">4:03:30</div>
+    <div class="sides">
+      <div class="side o"><b>Over</b><span>−110</span></div>
+      <div class="side u"><b>Under</b><span>−110</span></div>
+    </div>
+    <p class="move">Opened <b>4:02:30</b> on Oct 4 · <i>▲ 1:00</i> on race-day forecast</p>
+  </div>
+
+  <dl class="conds">
+    <div class="cond"><dt>Start temp</dt><dd>62°</dd><small>8:00 AM</small></div>
+    <div class="cond"><dt>Finish temp</dt><dd>68°</dd><small>~12:05 PM</small></div>
+    <div class="cond"><dt>Rain</dt><dd>10%</dd><small>Clear, full sun</small></div>
+    <div class="cond"><dt>Dew point</dt><dd>High</dd><small>Muggy start</small></div>
+  </dl>
+
+  <section>
+    <h2>The Board</h2>
+
+    <h3>Finishing time</h3>
+    <div class="rail">
+      <div class="bet"><p>Breaks 4:00:00</p><span class="odds plus">+230</span><span class="pct">30%</span></div>
+      <div class="bet"><p>Breaks 3:55:00</p><span class="odds plus">+1100</span><span class="pct">8%</span></div>
+      <div class="bet"><p>Over 4:15:00</p><span class="odds plus">+280</span><span class="pct">26%</span></div>
+      <div class="bet"><p>Over 4:30:00</p><span class="odds plus">+1000</span><span class="pct">9%</span></div>
+      <div class="bet"><p>Finishes at all</p><span class="odds minus">−5000</span><span class="pct">98%</span></div>
+    </div>
+
+    <h3>Race shape</h3>
+    <div class="rail">
+      <div class="bet"><p>Positive split (second half slower)</p><span class="odds minus">−350</span><span class="pct">78%</span></div>
+      <div class="bet"><p>Negative split</p><span class="odds plus">+350</span><span class="pct">22%</span></div>
+      <div class="bet"><p>Halfway between 2:00 and 2:03</p><span class="odds plus">+150</span><span class="pct">40%</span></div>
+      <div class="bet"><p>First mile under 9:15 (goes out hot)</p><span class="odds plus">+160</span><span class="pct">38%</span></div>
+      <div class="bet"><p>Walks through at least one aid station</p><span class="odds plus">+400</span><span class="pct">20%</span></div>
+      <div class="bet"><p>Mile 26 faster than mile 25 — up Roosevelt</p><span class="odds plus">+120</span><span class="pct">45%</span></div>
+    </div>
+
+    <h3>Novelty</h3>
+    <div class="rail">
+      <div class="bet"><p>Watch reads 26.40 or longer</p><span class="odds minus">−250</span><span class="pct">71%</span></div>
+      <div class="bet"><p>Takes a course banana after mile 20</p><span class="odds plus">+180</span><span class="pct">36%</span></div>
+      <div class="bet"><p>Finishes with an unused gel in the belt</p><span class="odds plus">+300</span><span class="pct">25%</span></div>
+      <div class="bet"><p>Names the Strava activity something other than "Morning Run"</p><span class="odds plus">+110</span><span class="pct">48%</span></div>
+      <div class="bet"><p>Signs up for a second marathon within 30 days</p><span class="odds plus">+250</span><span class="pct">29%</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Form Line</h2>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Dist</th><th>Time</th><th>Pace</th><th>Avg HR</th><th class="note">Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Aug 16</td><td>15.0</td><td>2:22:04</td><td>9:28</td><td>153</td><td class="note">Longest ever at the time</td></tr>
+          <tr><td>Aug 23</td><td>16.0</td><td>2:33:43</td><td>9:36</td><td>147</td><td class="note">Zone 4 drift gone</td></tr>
+          <tr><td>Sep 7</td><td>18.0</td><td>2:51:43</td><td>9:32</td><td>147</td><td class="note">Warm; 10% decoupling</td></tr>
+          <tr><td>Sep 13</td><td>13.0</td><td>2:02:23</td><td>9:24</td><td>142</td><td class="note">Closed 8:44; never hit Z4</td></tr>
+          <tr class="key"><td>Sep 20</td><td>20.0</td><td>3:07:47</td><td>9:23</td><td>147</td><td class="note">Peak run, in rain. 3% decoupling</td></tr>
+          <tr><td>Sep 27</td><td>12.0</td><td>1:53:07</td><td>9:24</td><td>139</td><td class="note">4 mi at 8:57 / 147 bpm</td></tr>
+          <tr><td>Oct 4</td><td>8.0</td><td>1:16:51</td><td>9:36</td><td>135</td><td class="note">2 mi at 9:01 / 147 bpm</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Handicapper's Read</h2>
+    <div class="read">
+      <p><strong>Why the line sits above the plan.</strong> The race plan projects 4:02. A book prices the distribution, not the plan, and first-marathon outcomes are lopsided: the upside caps around five minutes, the downside tail runs past twenty. Runners lose time after mile 20. They almost never find it.</p>
+      <p><strong>Supporting the under.</strong> Twenty miles at 3% decoupling. Goal pace sitting at 75% of max heart rate, confirmed twice in taper. Every variable rehearsed — breakfast, gels, drink, belt, shoes, and a full long run in the rain. Logistics failures wreck most first-timers and that risk is priced out.</p>
+      <p><strong>Supporting the over.</strong> Peak week of 32 miles, so glycogen depth is thin. Miles 20 to 26.2 have zero data behind them. A 60° overnight low means a muggy start with limited evaporative cooling, and clear skies put full sun on the exposed Michigan Avenue stretch from mile 22 to 25.</p>
+      <p><strong>The whole bet, in one line.</strong> Three straight marathon-pace workouts came in 8 to 12 seconds per mile faster than prescribed. That drift is free over two miles and ruinous over twenty. Under 4:03:30 is live — it just has to be earned before mile 13, not after mile 20.</p>
+    </div>
+  </section>
+
+  <footer>
+    Posted 10.10.26 · Entertainment only, no action accepted, your friends are not a licensed book.<br>
+    Form line from Strava. Conditions from NWS Chicago. Line subject to movement at the sole discretion of the runner's legs.
+  </footer>
+
+</div>
+
+</body></html>
